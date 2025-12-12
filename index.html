@@ -61,7 +61,7 @@ tr:hover{background:#f1f1f1;cursor:pointer;}
 
         <!-- Exam Type -->
         <div class="d-flex align-items-center">
-            <span class="me-2" style="">សូមជ្រើរើសប្រភេទប្រឡង៖</span>
+            <span class="me-2" style="">សូមជ្រើសរើសប្រភេទប្រឡង៖</span>
             <select id="examType"
                     class="form-select"
                     style="width: 200px; text-align:center; border:1px solid green;border:none">
@@ -159,7 +159,7 @@ tr:hover{background:#f1f1f1;cursor:pointer;}
   
       <!-- 👉 ដោយបង្ហាញនៅទីនេះ -->
 <p id="displayInfo" 
-   style="font-weight:bold; color:#000; font-size:16px; margin-top:10px;">
+   style="font-weight:bold; color:#000; font-size:16px; margin-top:2px;">
 </p>
 
     </p>
@@ -573,7 +573,7 @@ function updateDisplay() {
     if(type && date){
         let khDate = convertDateToKhmer(date);
         document.getElementById("displayInfo").innerHTML =
-            `មេរៀនសម្រាប់មើលត្រៀមប្រឡង​៖ <span style="color:red">${type}</span><br>
+            `មេរៀនសម្រាប់មើលត្រៀមប្រឡង​៖ <span style="color:red;padding-bottom:10px;">${type}</span><br>
              កាលបរិច្ឆេទ៖ <span style="color:red">${khDate}</span>`;
     }
 }
@@ -806,7 +806,7 @@ function validateExport(){
   let examDate = $("#date").val(); // ✅ id ត្រឹមត្រូវ
 
   if(!examType){
-    alert("សូមជ្រើសរើសប្រភេទសិន!");
+    alert("សូមជ្រើសរើសប្រភេទប្រឡងសិន!");
     return false;
   }
 

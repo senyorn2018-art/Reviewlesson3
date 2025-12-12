@@ -770,40 +770,12 @@ $("#clear").click(function(){
   clearForm();       // Clear Form
 });
 
-/* ✅ EXPORT */
-//full excel 
-/*function exportExcel(){
-
-  let list = JSON.parse(localStorage.getItem("aisData")) || [];
-
-  // ✅ Create Header like Logo Area
-  let wsData = [
-    ["AIS"],
-    ["American Intercon School"],
-    ["A Mengly J. Quach Education School"],
-    [""],
-    ["Level", "Title", "Page"]
-  ];
-
-  // ✅ Add table data
-  list.forEach(d => {
-    wsData.push([d.level, d.title, d.page]);
-  });
-
-  let ws = XLSX.utils.aoa_to_sheet(wsData);
-
-  // ✅ Create Workbook
-  let wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "AIS Data");
-
-  // ✅ Export
-  XLSX.writeFile(wb, "AIS_Full_Export.xlsx");
-}*/
-
+// ================== VALIDATE BEFORE EXPORT ==================
 // ================== VALIDATE BEFORE EXPORT ==================
 function validateExport(){
   let examType = $("#examType").val();
-  let examDate = $("#date").val(); // ✅ id ត្រឹមត្រូវ
+  let examDate = $("#date").val(); 
+  let list = JSON.parse(localStorage.getItem("aisData")) || [];
 
   if(!examType){
     alert("សូមជ្រើសរើសប្រភេទប្រឡងសិន!");
@@ -815,14 +787,28 @@ function validateExport(){
     return false;
   }
 
+  if(!currentLevel){
+    alert("សូមជ្រើស Level ជាមុនសិន!");
+    return false;
+  }
+
+  // ✅ Check if currentLevel has data
+  let hasData = list.some(d => d.level === currentLevel);
+  if(!hasData){
+    alert("សូមជ្រើរើសប្រភេទទិន្នន័យ និង add ឱ្យអស់សិន!");
+    return false;
+  }
+
   return true;
 }
 
 // ================== EXPORT EXCEL ==================
 function exportExcel(){
-  let list = JSON.parse(localStorage.getItem("aisData")) || [];
+  if(!validateExport()) return; // ✅ double check
 
-  // ✅ Create Header with Logo & Info
+  let list = JSON.parse(localStorage.getItem("aisData")) || [];
+  list = list.filter(d => d.level === currentLevel); // ✅ Export only current level
+
   let wsData = [
     ["AIS"],
     ["American Intercon School"],
@@ -841,11 +827,13 @@ function exportExcel(){
   let ws = XLSX.utils.aoa_to_sheet(wsData);
   let wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "AIS Data");
-  XLSX.writeFile(wb, "AIS_Full_Export.xlsx");
+  XLSX.writeFile(wb, `AIS_${currentLevel}_Export.xlsx`);
 }
 
 // ================== EXPORT PDF ==================
 function exportPDF(){
+  if(!validateExport()) return; 
+
   html2canvas(document.getElementById("exportArea"), {
     scale: 3,
     useCORS: true,
@@ -858,7 +846,7 @@ function exportPDF(){
     let imgHeight = canvas.height * pageWidth / canvas.width;
 
     pdf.addImage(imgData, "PNG", 0, 0, pageWidth, imgHeight);
-    pdf.save("AIS_Full_Export.pdf");
+    pdf.save(`AIS_${currentLevel}_Export.pdf`);
   }).catch(err => {
     alert("Export PDF Failed: " + err);
   });
@@ -866,37 +854,22 @@ function exportPDF(){
 
 // ================== EXPORT PHOTO ==================
 function exportImage(){
+  if(!validateExport()) return;
+
   html2canvas(document.getElementById("exportArea"), {
     scale: 3,
     useCORS: true,
     allowTaint: false
   }).then(canvas => {
     let link = document.createElement("a");
-    link.download = "AIS_Table_Review_Lesson.png";
+    link.download = `AIS_${currentLevel}_Table.png`;
     link.href = canvas.toDataURL("image/png");
     link.click();
   }).catch(err => {
     alert("Export Photo Failed: " + err);
   });
 }
-loadData();
-//validation export pdf
-/*function validateExport(){
-  let examType = $("#examType").val();
-  let examDate = $("#examDate").val();
 
-  if(!examType){
-    alert("សូមជ្រើសរើសប្រភេទសិន!");
-    return false;
-  }
-
-  if(!examDate){
-    alert("សូមជ្រើសរើសកាលបរិច្ឆេទសិន!");
-    return false;
-  }
-
-  return true;
-}*/
 
 </script>
 

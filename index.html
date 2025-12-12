@@ -771,7 +771,6 @@ $("#clear").click(function(){
 });
 
 // ================== VALIDATE BEFORE EXPORT ==================
-// ================== VALIDATE BEFORE EXPORT ==================
 function validateExport(){
   let examType = $("#examType").val();
   let examDate = $("#date").val(); 
@@ -792,7 +791,6 @@ function validateExport(){
     return false;
   }
 
-  // ✅ Check if currentLevel has data
   let hasData = list.some(d => d.level === currentLevel);
   if(!hasData){
     alert("សូមជ្រើរើសប្រភេទទិន្នន័យ និង add ឱ្យអស់សិន!");
@@ -804,10 +802,10 @@ function validateExport(){
 
 // ================== EXPORT EXCEL ==================
 function exportExcel(){
-  if(!validateExport()) return; // ✅ double check
+  if(!validateExport()) return;
 
   let list = JSON.parse(localStorage.getItem("aisData")) || [];
-  list = list.filter(d => d.level === currentLevel); // ✅ Export only current level
+  list = list.filter(d => d.level === currentLevel);
 
   let wsData = [
     ["AIS"],
@@ -831,8 +829,8 @@ function exportExcel(){
 }
 
 // ================== EXPORT PDF ==================
-function exportPDF(){
-  if(!validateExport()) return; 
+function exportPDF() {
+  if (!validateExport()) return;
 
   html2canvas(document.getElementById("exportArea"), {
     scale: 3,
@@ -840,12 +838,28 @@ function exportPDF(){
     allowTaint: false
   }).then(canvas => {
     let imgData = canvas.toDataURL("image/png");
+
+    const { jsPDF } = window.jspdf;
     let pdf = new jsPDF("p", "mm", "a4");
 
-    let pageWidth  = pdf.internal.pageSize.getWidth();
-    let imgHeight = canvas.height * pageWidth / canvas.width;
+    let pageWidth = pdf.internal.pageSize.getWidth();
+    let pageHeight = pdf.internal.pageSize.getHeight();
 
-    pdf.addImage(imgData, "PNG", 0, 0, pageWidth, imgHeight);
+    let imgWidth = pageWidth;
+    let imgHeight = (canvas.height * pageWidth) / canvas.width;
+
+    let heightLeft = imgHeight;
+    let position = 0;
+
+    while (heightLeft > 0) {
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+      if (heightLeft > 0) {
+        pdf.addPage();
+        position = -pageHeight;
+      }
+    }
+
     pdf.save(`AIS_${currentLevel}_Export.pdf`);
   }).catch(err => {
     alert("Export PDF Failed: " + err);
@@ -871,8 +885,10 @@ function exportImage(){
 }
 
 
+
 </script>
 
 </body>
 </html>
+
 
